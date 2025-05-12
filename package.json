@@ -1,0 +1,30 @@
+{
+  "name": "mantiac---backend",
+  "version": "1.0.0",
+  "description": "Backend de proyecto de Servicio de Mantenimiento de aires acondicionados - MERN",
+  "homepage": "https://github.com/Diego3pz/MantiAC-Backend#readme",
+  "bugs": {
+    "url": "https://github.com/Diego3pz/MantiAC-Backend/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Diego3pz/MantiAC-Backend.git"
+  },
+  "license": "ISC",
+  "author": "Diego Espinoza",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/index.ts"
+  },
+  "dependencies": {
+    "colors": "^1.4.0",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.1",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
