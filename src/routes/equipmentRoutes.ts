@@ -2,6 +2,9 @@ import { Router } from "express";
 import { body, param } from 'express-validator';
 import { EquipmentController } from "../controllers/EquipmentController";
 import { handleInputErrors } from "../middleware/validation";
+import { MaintenanceController } from "../controllers/maintenanceController";
+import { validateFilterCleaning, validateMaintenanceType, validatePreventiveMaintenance } from "../middleware/maintenanceValidation";
+import { validateEquipmentExists } from "../middleware/Equipment";
 
 const router = Router();
 
@@ -53,7 +56,7 @@ router.put(
     body('serialNumber')
         .notEmpty().withMessage('El Número de Serie del Equipo no puede estar vacío'),
     body('location')
-        
+
         .isIn([
             'Oficinas administrativas',
             'Oficinas corporativas',
@@ -78,6 +81,42 @@ router.delete(
         .isMongoId().withMessage('El ID del equipo no es válido'),
     handleInputErrors,
     EquipmentController.deleteEquipment
+);
+
+
+// Router Maintenance //
+
+// Get all maintenances
+router.get('/',
+    MaintenanceController.getAllMaintenances
+);
+
+// Get a single maintenance by ID
+router.get('/:id',
+    MaintenanceController.getMaintenanceById
+
+);
+
+// Create a new maintenance
+router.post('/:equipmentId/maintenance',
+    param('equipmentId')
+        .isMongoId().withMessage('El ID del equipo no es válido'),
+    validateEquipmentExists,
+    validateMaintenanceType,
+    handleInputErrors,
+    MaintenanceController.createMaintenance
+
+);
+
+// Update an existing maintenance
+router.put('/:id',
+    MaintenanceController.updateMaintenance
+
+);
+
+// Delete a maintenance
+router.delete('/:id',
+    MaintenanceController.deleteMaintenance
 );
 
 export default router;

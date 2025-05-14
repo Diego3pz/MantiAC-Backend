@@ -1,4 +1,5 @@
-import mongoose, { Schema, Document, mongo } from 'mongoose'
+import mongoose, { Schema, Document, PopulatedDoc, Types } from 'mongoose'
+import { IMaintenance } from './Maintenance';
 
 const locationEquipment = {
     administrativeOffices: 'Oficinas administrativas',
@@ -20,6 +21,7 @@ export interface IEquipment extends Document {
     brand: string;
     serialNumber: string;
     location: LocationEquipment;
+    maintenance: PopulatedDoc<IMaintenance & Document>[];
 }
 
 const equipmentSchema = new Schema<IEquipment>(
@@ -46,6 +48,12 @@ const equipmentSchema = new Schema<IEquipment>(
             default: locationEquipment.administrativeOffices,
             required: true,
         },
+        maintenance: [
+            {
+                type: Types.ObjectId,
+                ref: 'Maintenance',
+            },
+        ],
     }, { timestamps: true }
 );
 

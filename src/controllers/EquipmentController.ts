@@ -4,13 +4,12 @@ import Equipment from '../models/Equipment';
 export class EquipmentController {
     static createEquipment = async (req: Request, res: Response) => {
         const equipment = new Equipment(req.body);
-
         try {
             await equipment.save();
-            res.status(201).json({ message: 'Equipo creado correctamente', equipment });
+            res.send('Equipo creado correctamente');
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error al crear el equipo', error });
+            
         }
     };
 
@@ -20,7 +19,7 @@ export class EquipmentController {
             res.status(200).json(equipments);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error al obtener los equipos', error });
+           
         }
     };
 
@@ -36,7 +35,7 @@ export class EquipmentController {
             res.status(200).json(equipment);
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error al obtener el equipo', error });
+            
         }
     };
 
@@ -49,10 +48,10 @@ export class EquipmentController {
                 res.status(404).json({ message: 'Equipo no encontrado' });
                 return
             }
-            res.status(200).json({ message: 'Equipo actualizado correctamente', equipment });
+            res.send('Equipo actualizado correctamente');
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error al actualizar el equipo', error });
+            
         }
     };
 
@@ -68,7 +67,7 @@ export class EquipmentController {
             res.status(200).json({ message: 'Equipo eliminado correctamente' });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: 'Error al eliminar el equipo', error });
+            
         }
     };
 }

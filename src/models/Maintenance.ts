@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 const maintenanceType = {
     fullPreventive: 'Preventivo Completo',
@@ -9,12 +9,12 @@ const maintenanceType = {
 export type MaintenanceType = typeof maintenanceType[keyof typeof maintenanceType];
 
 export interface IMaintenance extends Document {
-    equipment: mongoose.Types.ObjectId;
+    equipment: Types.ObjectId;
     type: MaintenanceType;
     date: Date;
     description?: string;
     cost?: number;
-    performedBy: mongoose.Types.ObjectId; 
+    performedBy: Types.ObjectId; 
     supervisedBy: string;
 }
 
@@ -38,7 +38,6 @@ const maintenanceSchema = new Schema<IMaintenance>(
             type: String,
             validate: {
                 validator: function (this: IMaintenance, value: string) {
-                    
                     if (this.type === maintenanceType.corrective && !value) {
                         return false;
                     }
@@ -51,7 +50,6 @@ const maintenanceSchema = new Schema<IMaintenance>(
             type: Number,
             validate: {
                 validator: function (this: IMaintenance, value: number) {
-                    
                     if (this.type === maintenanceType.corrective && (value === null || value === undefined)) {
                         return false;
                     }

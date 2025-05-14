@@ -12,4 +12,5 @@ app.use(express.json())
 // Routes
 app.use('/api/equipments', equipmentRoutes)
 
+
 export default app
