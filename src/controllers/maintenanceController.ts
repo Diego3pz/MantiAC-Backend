@@ -43,15 +43,11 @@ export class MaintenanceController {
     };
 
     static getMaintenanceById = async (req: Request, res: Response) => {
-        const { id } = req.params
 
 
         try {
-            const maintenances = await Maintenance.findById(id);
-            if (!maintenances) {
-                res.status(404).json({ message: 'Mantenimiento no encontrado' })
-                return
-            }
+            const { maintenanceId } = req.params
+            const maintenances = await Maintenance.findById(maintenanceId);
             res.status(200).json(maintenances);
         } catch (error) {
             console.log(error);
@@ -60,22 +56,18 @@ export class MaintenanceController {
     }
 
     static updateMaintenance = async (req: Request, res: Response) => {
-        const { id } = req.params
-        const { type, date, description } = req.body
+        const { type, date, description, cost, performedBy, supervisedBy } = req.body
         try {
-            const maintenance = await Maintenance.findById(id)
-            if (!maintenance) {
-                const error = new Error('Mantenimiento no encontrado')
-                res.status(404).json({ error: error.message })
-                return
-            }
 
+            req.maintenance.type = type
+            req.maintenance.date = date
+            req.maintenance.description = description
+            req.maintenance.cost = cost
+            req.maintenance.performedBy = performedBy
+            req.maintenance.supervisedBy = supervisedBy
 
-            maintenance.type = type
-            maintenance.date = date
-            maintenance.description = description
-
-            await maintenance.save()
+            // Actualiza el mantenimiento
+            await req.maintenance.save()
             res.send('Mantenimiento actualizado correctamente')
         } catch (error) {
             console.log(error);
@@ -85,31 +77,37 @@ export class MaintenanceController {
 
     static deleteMaintenance = async (req: Request, res: Response) => {
         try {
-            const { id } = req.params;
-
-            // Busca el mantenimiento por ID
-            const maintenance = await Maintenance.findById(id);
-            if (!maintenance) {
-                 res.status(404).json({ error: 'Mantenimiento no encontrado' });
-                 return
-            }
 
             // Busca el equipo relacionado con el mantenimiento
-            const equipment = await Equipment.findById(maintenance.equipment);
+            const equipment = await Equipment.findById(req.maintenance.equipment);
             if (!equipment) {
-                 res.status(404).json({ error: 'Equipo relacionado no encontrado' });
-                 return
+                res.status(404).json({ error: 'Equipo relacionado no encontrado' });
+                return
             }
 
             // Elimina la referencia del mantenimiento en el array del equipo
             equipment.maintenance = equipment.maintenance.filter(
-                (m) => m.toString() !== maintenance.id.toString()
+                (m) => m.toString() !== req.maintenance.id.toString()
             );
 
-             await Promise.allSettled([maintenance.deleteOne(), equipment.save()]);
+            await Promise.allSettled([req.maintenance.deleteOne(), equipment.save()]);
             res.send('Mantenimiento eliminado correctamente')
         } catch (error) {
             console.log(error);
+
+        }
+    }
+
+    static updateMaintenanceStatus = async (req: Request, res: Response) => {
+        try {
+            const { completed } = req.body
+            req.maintenance.completed = completed
+            await req.maintenance.save()
+            res.send('Estado del mantenimiento actualizado correctamente')
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Hubo un error al actualizar el estado' });
 
         }
     }

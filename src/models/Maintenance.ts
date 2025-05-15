@@ -17,6 +17,7 @@ export interface IMaintenance extends Document {
     cost?: number;
     performedBy: Types.ObjectId;
     supervisedBy: string;
+    completed: boolean;
 }
 
 const maintenanceSchema = new Schema<IMaintenance>(
@@ -47,6 +48,10 @@ const maintenanceSchema = new Schema<IMaintenance>(
         },
         supervisedBy: {
             type: String,
+        },
+        completed: {
+            type: Boolean,
+            default: false,
         },
     },
     { timestamps: true }

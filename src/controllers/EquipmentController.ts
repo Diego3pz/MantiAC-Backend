@@ -9,7 +9,7 @@ export class EquipmentController {
             res.send('Equipo creado correctamente');
         } catch (error) {
             console.error(error);
-            
+
         }
     };
 
@@ -19,55 +19,46 @@ export class EquipmentController {
             res.status(200).json(equipments);
         } catch (error) {
             console.error(error);
-           
+
         }
     };
 
     static getEquipmentByID = async (req: Request, res: Response) => {
-        const { id } = req.params;
 
         try {
-            const equipment = await Equipment.findById(id);
-            if (!equipment) {
-                res.status(404).json({ message: 'Equipo no encontrado' });
-                return
-            }
-            res.status(200).json(equipment);
+            res.status(200).json(req.equipment);
         } catch (error) {
             console.error(error);
-            
+
         }
     };
 
     static updateEquipment = async (req: Request, res: Response) => {
-        const { id } = req.params;
-
+        const { brand, serialNumber, location } = req.body
         try {
-            const equipment = await Equipment.findByIdAndUpdate(id, req.body, { new: true });
-            if (!equipment) {
-                res.status(404).json({ message: 'Equipo no encontrado' });
-                return
-            }
+            req.equipment.brand = brand
+            req.equipment.serialNumber = serialNumber
+            req.equipment.location = location
+
+            // Actualizar el equipo 
+            await req.equipment.save()
+
             res.send('Equipo actualizado correctamente');
         } catch (error) {
             console.error(error);
-            
+
         }
     };
 
     static deleteEquipment = async (req: Request, res: Response) => {
-        const { id } = req.params;
-
         try {
-            const equipment = await Equipment.findByIdAndDelete(id);
-            if (!equipment) {
-                res.status(404).json({ message: 'Equipo no encontrado' });
-                return
-            }
-            res.status(200).json({ message: 'Equipo eliminado correctamente' });
+
+            // Eliminar el equipo
+            await req.equipment.deleteOne();
+            res.send('Equipo eliminado correctamente');
         } catch (error) {
             console.error(error);
-            
+
         }
     };
 }

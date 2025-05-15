@@ -10,15 +10,21 @@ declare global {
 }
 
 export const validateEquipmentExists = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { equipmentId } = req.params;
-    const equipment = await Equipment.findById(equipmentId);
+    try {
+        const { equipmentId } = req.params;
+        const equipment = await Equipment.findById(equipmentId);
 
-    if (!equipment) {
-        const error = new Error('Equipo no encontrado');
-        res.status(404).json({ error: error.message });
-        return
-    } else {
-        req.equipment = equipment;
-        next();
+        if (!equipment) {
+            const error = new Error('Equipo no encontrado');
+            res.status(404).json({ error: error.message });
+            return
+        } else {
+            req.equipment = equipment;
+            next();
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Hubo un error en el equipo' });
+
     }
 }
+

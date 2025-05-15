@@ -5,6 +5,7 @@ import { handleInputErrors } from "../middleware/validation";
 import { MaintenanceController } from "../controllers/maintenanceController";
 import { validateFilterCleaning, validateMaintenanceData, validateMaintenanceType, validatePreventiveMaintenance } from "../middleware/maintenanceValidation";
 import { validateEquipmentExists } from "../middleware/Equipment";
+import { validateMaintenanceExists } from "../middleware/Maintenance";
 
 const router = Router();
 
@@ -12,6 +13,9 @@ const router = Router();
 router.get('/maintenance',
     MaintenanceController.getAllMaintenances
 );
+
+// Router Equipment //
+router.param('equipmentId', validateEquipmentExists)
 
 // Crear un equipo
 router.post(
@@ -44,8 +48,8 @@ router.get('/', EquipmentController.getAllEquipments);
 
 // Obtener un equipo por ID
 router.get(
-    '/:id',
-    param('id')
+    '/:equipmentId',
+    param('equipmentId')
         .isMongoId().withMessage('El ID del equipo no es válido'),
     handleInputErrors,
     EquipmentController.getEquipmentByID
@@ -53,8 +57,8 @@ router.get(
 
 // Actualizar un equipo por ID
 router.put(
-    '/:id',
-    param('id')
+    '/:equipmentId',
+    param('equipmentId')
         .isMongoId().withMessage('El ID del equipo no es válido'),
     body('brand')
         .notEmpty().withMessage('La Marca del Equipo no puede estar vacía'),
@@ -81,8 +85,8 @@ router.put(
 
 // Eliminar un equipo por ID
 router.delete(
-    '/:id',
-    param('id')
+    '/:equipmentId',
+    param('equipmentId')
         .isMongoId().withMessage('El ID del equipo no es válido'),
     handleInputErrors,
     EquipmentController.deleteEquipment
@@ -90,20 +94,20 @@ router.delete(
 
 
 // Router Maintenance //
+router.param('maintenanceId', validateMaintenanceExists)
 
 // Obtener todos los mantenimientos por equipo
 router.get('/:equipmentId/maintenance',
     param('equipmentId')
         .isMongoId().withMessage('El ID del equipo no es válido'),
-    validateEquipmentExists,
     handleInputErrors,
     MaintenanceController.getAllMaintenancesByEquipment
 );
 
 
 // Obtener mantenimientos por equipo
-router.get('/maintenance/:id',
-    param('id')
+router.get('/maintenance/:maintenanceId',
+    param('maintenanceId')
         .isMongoId().withMessage('El ID del mantenimiento no es válido'),
     handleInputErrors,
     MaintenanceController.getMaintenanceById
@@ -130,16 +134,15 @@ router.post('/:equipmentId/maintenance',
         .isMongoId().withMessage('El ID del usuario que realizó el mantenimiento no es válido'),
     body('supervisedBy')
         .isString().withMessage('El nombre del supervisor es obligatorio'),
-    validateEquipmentExists,
+    handleInputErrors,
     validateMaintenanceType,
     validateMaintenanceData,
-    handleInputErrors,
     MaintenanceController.createMaintenance
 );
 
 // Actualizar un mantenimiento
-router.put('/maintenance/:id',
-    param('id')
+router.put('/maintenance/:maintenanceId',
+    param('maintenanceId')
         .isMongoId().withMessage('El ID del mantenimiento no es válido'),
     body('type')
         .notEmpty().withMessage('El tipo de mantenimiento es obligatorio')
@@ -157,18 +160,31 @@ router.put('/maintenance/:id',
         .notEmpty().isMongoId().withMessage('El ID del usuario que realizó el mantenimiento no es válido'),
     body('supervisedBy')
         .notEmpty().withMessage('El nombre del supervisor es obligatorio'),
+    handleInputErrors,
     validateMaintenanceType,
     validateMaintenanceData,
-    handleInputErrors,
     MaintenanceController.updateMaintenance
 );
 
 // Eliminar un mantenimiento
-router.delete('/maintenance/:id',
-    param('id')
+router.delete('/maintenance/:maintenanceId',
+    param('maintenanceId')
         .isMongoId().withMessage('El ID del mantenimiento no es válido'),
     handleInputErrors,
     MaintenanceController.deleteMaintenance
 );
+
+// Actualizar el estado de un mantenimiento
+router.post('/:equipmentId/maintenance/:maintenanceId/completed',
+    param('equipmentId')
+        .isMongoId().withMessage('El ID del equipo no es válido'),
+    param('maintenanceId')
+        .isMongoId().withMessage('El ID del mantenimiento no es válido'),
+    body('completed')
+        .notEmpty().withMessage('El estado del mantenimiento es obligatorio')
+        .isBoolean().withMessage('El estado del mantenimiento debe ser un booleano'),
+    handleInputErrors,
+    MaintenanceController.updateMaintenanceStatus
+)
 
 export default router;
