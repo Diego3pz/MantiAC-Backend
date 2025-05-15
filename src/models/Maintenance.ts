@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, Types } from 'mongoose';
+import Equipment from './Equipment';
 
-const maintenanceType = {
+export const maintenanceType = {
     fullPreventive: 'Preventivo Completo',
     filterCleaning: 'Limpieza de filtros',
     corrective: 'Correctivo',
@@ -14,7 +15,7 @@ export interface IMaintenance extends Document {
     date: Date;
     description?: string;
     cost?: number;
-    performedBy: Types.ObjectId; 
+    performedBy: Types.ObjectId;
     supervisedBy: string;
 }
 
@@ -36,27 +37,9 @@ const maintenanceSchema = new Schema<IMaintenance>(
         },
         description: {
             type: String,
-            validate: {
-                validator: function (this: IMaintenance, value: string) {
-                    if (this.type === maintenanceType.corrective && !value) {
-                        return false;
-                    }
-                    return true;
-                },
-                message: 'La descripción es obligatoria para mantenimientos correctivos.',
-            },
         },
         cost: {
             type: Number,
-            validate: {
-                validator: function (this: IMaintenance, value: number) {
-                    if (this.type === maintenanceType.corrective && (value === null || value === undefined)) {
-                        return false;
-                    }
-                    return true;
-                },
-                message: 'El costo es obligatorio para mantenimientos correctivos.',
-            },
         },
         performedBy: {
             type: Schema.Types.ObjectId,
@@ -68,6 +51,7 @@ const maintenanceSchema = new Schema<IMaintenance>(
     },
     { timestamps: true }
 );
+
 
 const Maintenance = mongoose.model<IMaintenance>('Maintenance', maintenanceSchema);
 export default Maintenance;

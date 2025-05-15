@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, PopulatedDoc, Types } from 'mongoose'
-import { IMaintenance } from './Maintenance';
+import Maintenance, { IMaintenance } from './Maintenance';
 
 const locationEquipment = {
     administrativeOffices: 'Oficinas administrativas',
@@ -56,6 +56,17 @@ const equipmentSchema = new Schema<IEquipment>(
         ],
     }, { timestamps: true }
 );
+
+/* Middleware */
+equipmentSchema.pre('deleteOne', { document: true }, async function () {
+    const equipmentId = this._id
+    if (!equipmentId) return
+
+    // Eliminar los mantenimientos asociados al equipo
+    await Maintenance.deleteMany({ equipment: equipmentId })
+
+})
+
 
 const Equipment = mongoose.model<IEquipment>('Equipment', equipmentSchema)
 export default Equipment

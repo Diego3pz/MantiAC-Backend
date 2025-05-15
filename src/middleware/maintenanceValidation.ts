@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import Maintenance from '../models/Maintenance';
+import Maintenance, { maintenanceType } from '../models/Maintenance';
+
 
 export const validatePreventiveMaintenance = async (req: Request, res: Response, next: NextFunction) => {
     const { equipmentId } = req.params;
@@ -9,10 +10,11 @@ export const validatePreventiveMaintenance = async (req: Request, res: Response,
 
     const currentDate = new Date();
     const february15 = new Date(currentDate.getFullYear(), 1, 15); 
-    const march31 = new Date(currentDate.getFullYear(), 2, 31); 
+    const march31 = new Date(currentDate.getFullYear(), 2, 31);
+    const dateNow = new Date(); // Fecha actual testeo
 
     // Validar que la fecha esté dentro del rango permitido
-    if (currentDate < february15 || currentDate > march31) {
+    if (currentDate < february15 || currentDate > dateNow) {
          res.status(400).json({ message: 'El mantenimiento preventivo completo solo puede realizarse entre el 15 de febrero y el 31 de marzo.' });
          return
     }
@@ -87,5 +89,39 @@ export const validateMaintenanceType = async (req: Request, res: Response, next:
         next();
     } catch (error) {
         res.status(400).json({ message: error.message });
+    }
+};
+
+export const validateMaintenanceData = async (req: Request, res: Response, next: NextFunction) => {
+    const { type, description, cost } = req.body;
+
+    try {
+        // Validar descripción para correctivos
+        if (type === 'Correctivo' && (!description || description.trim() === '')) {
+            res.status(400).json({ message: 'La descripción es obligatoria para mantenimientos correctivos.' });
+            return;
+        }
+
+        // Validar costo para correctivos
+        if (type === 'Correctivo' && (cost === null || cost === undefined)) {
+            res.status(400).json({ message: 'El costo es obligatorio para mantenimientos correctivos.' });
+            return;
+        }
+
+        // Validar que el costo no esté definido para otros tipos
+        if ((type === 'Preventivo Completo' || type === 'Limpieza de filtros') && (cost !== null && cost !== undefined)) {
+            res.status(400).json({ message: 'El costo solo debe especificarse para mantenimientos correctivos.' });
+            return;
+        }
+
+        // Validar tipo de mantenimiento
+        if (!Object.values(maintenanceType).includes(type)) {
+            res.status(400).json({ message: 'El tipo de mantenimiento no es válido.' });
+            return;
+        }
+
+        next();
+    } catch (error) {
+        res.status(500).json({ message: 'Error al validar los datos del mantenimiento.', error: error.message });
     }
 };
