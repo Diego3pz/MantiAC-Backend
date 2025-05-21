@@ -38,7 +38,7 @@ export class MaintenanceController {
             res.status(200).json(maintenances);
         } catch (error) {
             console.log(error);
-            res.status(500).json({ message: 'Error al obtener todos los mantenimientos.' });
+            res.status(500).json({ error: 'Error al obtener todos los mantenimientos.' });
         }
     };
 

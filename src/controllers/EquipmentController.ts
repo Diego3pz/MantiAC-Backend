@@ -4,6 +4,14 @@ import Equipment from '../models/Equipment';
 export class EquipmentController {
     static createEquipment = async (req: Request, res: Response) => {
         const equipment = new Equipment(req.body);
+
+        // Validar si el número de serie ya existe
+        const existingEquipment = await Equipment.findOne({ serialNumber: equipment.serialNumber });
+        if (existingEquipment) {
+             res.status(400).json({ error: 'El numero de serie ya existe' });
+             return
+        }
+
         try {
             await equipment.save();
             res.send('Equipo creado correctamente');
