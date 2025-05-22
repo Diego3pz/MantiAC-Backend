@@ -14,8 +14,9 @@ const app = express()
 app.use(cors(corsConfig))
 
 // // Logging
-// app.use(morgan('dev'))
+app.use(morgan('dev'))
 
+// Leer datos de formulario
 app.use(express.json())
 
 // Routes
