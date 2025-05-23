@@ -15,7 +15,8 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/index.ts"
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "dev:api": "nodemon --exec ts-node src/index.ts --api"
   },
   "dependencies": {
     "colors": "^1.4.0",

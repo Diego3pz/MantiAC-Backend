@@ -8,8 +8,8 @@ export class EquipmentController {
         // Validar si el número de serie ya existe
         const existingEquipment = await Equipment.findOne({ serialNumber: equipment.serialNumber });
         if (existingEquipment) {
-             res.status(400).json({ error: 'El numero de serie ya existe' });
-             return
+            res.status(400).json({ error: 'El numero de serie ya existe' });
+            return
         }
 
         try {
@@ -43,6 +43,16 @@ export class EquipmentController {
 
     static updateEquipment = async (req: Request, res: Response) => {
         const { brand, serialNumber, location } = req.body
+
+        // Validar si el número de serie ya existe
+        const existingEquipment = await Equipment.findOne({
+            serialNumber: serialNumber,
+            _id: { $ne: req.equipment._id } 
+        });
+        if (existingEquipment) {
+            res.status(400).json({ error: 'El numero de serie ya existe' });
+            return;
+        }
         try {
             req.equipment.brand = brand
             req.equipment.serialNumber = serialNumber

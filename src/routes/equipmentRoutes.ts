@@ -128,8 +128,14 @@ router.post('/:equipmentId/maintenance',
     body('date')
         .notEmpty().withMessage('La fecha del mantenimiento es obligatoria')
         .isDate().withMessage('La fecha del mantenimiento no es válida'),
+    // Verificar que el tipo sea correctivo para la descripción y el costo
     body('description')
-        .notEmpty().withMessage('La descripción del mantenimiento es obligatoria'),
+        .if(body('type').equals('Correctivo'))
+        .notEmpty().withMessage('La descripción es obligatoria para correctivos'),
+    body('cost')
+        .if(body('type').equals('Correctivo'))
+        .notEmpty().withMessage('El costo es obligatorio para correctivos'),
+
     body('performedBy')
         .isMongoId().withMessage('El ID del usuario que realizó el mantenimiento no es válido'),
     body('supervisedBy')
@@ -154,8 +160,15 @@ router.put('/maintenance/:maintenanceId',
     body('date')
         .notEmpty().withMessage('La fecha del mantenimiento es obligatoria')
         .isDate().withMessage('La fecha del mantenimiento no es válida'),
+
+    // Verificar que el tipo sea correctivo para la descripción y el costo
     body('description')
-        .notEmpty().withMessage('La descripción del mantenimiento es obligatoria'),
+        .if(body('type').equals('Correctivo'))
+        .notEmpty().withMessage('La descripción es obligatoria para correctivos'),
+    body('cost')
+        .if(body('type').equals('Correctivo'))
+        .notEmpty().withMessage('El costo es obligatorio para correctivos'),
+
     body('performedBy')
         .notEmpty().isMongoId().withMessage('El ID del usuario que realizó el mantenimiento no es válido'),
     body('supervisedBy')

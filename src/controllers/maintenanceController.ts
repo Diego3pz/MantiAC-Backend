@@ -16,7 +16,7 @@ export class MaintenanceController {
             res.send('Mantenimiento creado correctamente')
 
         } catch (error) {
-
+            res.status(500).json({ error: 'Hubo un error' })
         }
     }
 
@@ -27,7 +27,7 @@ export class MaintenanceController {
             const maintenances = await Maintenance.find({ equipment: equipmentId }).populate('equipment')
             res.status(200).json(maintenances)
         } catch (error) {
-            console.log(error);
+            res.status(500).json({error: 'Hubo un error'})
 
         }
     }
@@ -37,8 +37,8 @@ export class MaintenanceController {
             const maintenances = await Maintenance.find({}).populate('equipment');
             res.status(200).json(maintenances);
         } catch (error) {
-            console.log(error);
             res.status(500).json({ error: 'Error al obtener todos los mantenimientos.' });
+            return
         }
     };
 
@@ -50,7 +50,7 @@ export class MaintenanceController {
             const maintenances = await Maintenance.findById(maintenanceId);
             res.status(200).json(maintenances);
         } catch (error) {
-            console.log(error);
+            res.status(500).json({error: 'Hubo un error'})
 
         }
     }
@@ -70,7 +70,7 @@ export class MaintenanceController {
             await req.maintenance.save()
             res.send('Mantenimiento actualizado correctamente')
         } catch (error) {
-            console.log(error);
+            res.status(500).json({error: 'Hubo un error'})
 
         }
     }
@@ -93,7 +93,7 @@ export class MaintenanceController {
             await Promise.allSettled([req.maintenance.deleteOne(), equipment.save()]);
             res.send('Mantenimiento eliminado correctamente')
         } catch (error) {
-            console.log(error);
+           res.status(500).json({error: 'Hubo un error'})
 
         }
     }
@@ -106,7 +106,6 @@ export class MaintenanceController {
             res.send('Estado del mantenimiento actualizado correctamente')
 
         } catch (error) {
-            console.log(error);
             res.status(500).json({ error: 'Hubo un error al actualizar el estado' });
 
         }
