@@ -47,7 +47,7 @@ export class MaintenanceController {
 
         try {
             const { maintenanceId } = req.params
-            const maintenances = await Maintenance.findById(maintenanceId);
+            const maintenances = await Maintenance.findById(maintenanceId).populate('equipment');;
             res.status(200).json(maintenances);
         } catch (error) {
             res.status(500).json({error: 'Hubo un error'})
