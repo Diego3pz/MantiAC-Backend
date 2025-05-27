@@ -4,19 +4,18 @@ import Equipment from '../models/Equipment';
 
 export class MaintenanceController {
     static createMaintenance = async (req: Request, res: Response) => {
-
-
-
         try {
-            const maintenance = new Maintenance(req.body)
-            maintenance.equipment = req.equipment.id
-            req.equipment.maintenance.push(maintenance.id)
+            if (req.body.date) {
+                req.body.date = new Date(req.body.date + "T12:00:00");
+            }
+            const maintenance = new Maintenance(req.body);
+            maintenance.equipment = req.equipment.id;
+            req.equipment.maintenance.push(maintenance.id);
 
-            await Promise.allSettled([maintenance.save(), req.equipment.save()])
-            res.send('Mantenimiento creado correctamente')
-
+            await Promise.allSettled([maintenance.save(), req.equipment.save()]);
+            res.send('Mantenimiento creado correctamente');
         } catch (error) {
-            res.status(500).json({ error: 'Hubo un error' })
+            res.status(500).json({ error: 'Hubo un error' });
         }
     }
 
@@ -27,7 +26,7 @@ export class MaintenanceController {
             const maintenances = await Maintenance.find({ equipment: equipmentId }).populate('equipment')
             res.status(200).json(maintenances)
         } catch (error) {
-            res.status(500).json({error: 'Hubo un error'})
+            res.status(500).json({ error: 'Hubo un error' })
 
         }
     }
@@ -50,30 +49,27 @@ export class MaintenanceController {
             const maintenances = await Maintenance.findById(maintenanceId).populate('equipment');;
             res.status(200).json(maintenances);
         } catch (error) {
-            res.status(500).json({error: 'Hubo un error'})
+            res.status(500).json({ error: 'Hubo un error' })
 
         }
     }
 
     static updateMaintenance = async (req: Request, res: Response) => {
-        const { type, date, description, cost, performedBy, supervisedBy } = req.body
-        try {
+    const { type, date, description, cost, performedBy, supervisedBy } = req.body;
+    try {
+        req.maintenance.type = type;
+        req.maintenance.date = date ? new Date(date + "T12:00:00") : req.maintenance.date;
+        req.maintenance.description = description;
+        req.maintenance.cost = cost;
+        req.maintenance.performedBy = performedBy;
+        req.maintenance.supervisedBy = supervisedBy;
 
-            req.maintenance.type = type
-            req.maintenance.date = date
-            req.maintenance.description = description
-            req.maintenance.cost = cost
-            req.maintenance.performedBy = performedBy
-            req.maintenance.supervisedBy = supervisedBy
-
-            // Actualiza el mantenimiento
-            await req.maintenance.save()
-            res.send('Mantenimiento actualizado correctamente')
-        } catch (error) {
-            res.status(500).json({error: 'Hubo un error'})
-
-        }
+        await req.maintenance.save();
+        res.send('Mantenimiento actualizado correctamente');
+    } catch (error) {
+        res.status(500).json({ error: 'Hubo un error' });
     }
+}
 
     static deleteMaintenance = async (req: Request, res: Response) => {
         try {
@@ -93,7 +89,7 @@ export class MaintenanceController {
             await Promise.allSettled([req.maintenance.deleteOne(), equipment.save()]);
             res.send('Mantenimiento eliminado correctamente')
         } catch (error) {
-           res.status(500).json({error: 'Hubo un error'})
+            res.status(500).json({ error: 'Hubo un error' })
 
         }
     }
