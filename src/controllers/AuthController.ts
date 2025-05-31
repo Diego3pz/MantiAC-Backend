@@ -256,7 +256,7 @@ export class AuthController {
     }
 
     static updateProfile = async (req: Request, res: Response): Promise<void> => {
-        const { name, email } = req.body
+        const { name, lastName, email } = req.body
 
         const userExists = await User.findOne({ email })
         if (userExists && userExists.id.toString() !== req.user.id.toString()) {
@@ -273,7 +273,8 @@ export class AuthController {
 
 
         req.user.name = name
-        req.user.email = email
+        req.user.lastName = lastName
+            req.user.email = email
 
         try {
             await req.user.save()
@@ -296,7 +297,6 @@ export class AuthController {
             return
         }
 
-
         try {
             user.password = await hashPassword(password)
             await user.save()
@@ -305,5 +305,21 @@ export class AuthController {
             res.status(500).json({ message: 'Error interno del servidor' })
         }
 
+    }
+
+    static updateNotifications = async (req: Request, res: Response): Promise<void> => {
+        try {
+            if (!req.user) {
+                const error = new Error('El usuario no existe')
+                res.status(404).json({ error: error.message })
+                return
+            }
+
+            req.user.notificationsEnabled = req.body.notificationsEnabled;
+            await req.user.save();
+            res.send('Notificaciones actualizadas correctamente');
+        } catch (error) {
+            res.status(500).json({ message: 'Error interno del servidor' })
+        }
     }
 }

@@ -28,3 +28,12 @@ export const validateMaintenanceExists = async (req: Request, res: Response, nex
     }
 }
 
+export function hasAuthorization(req: Request, res: Response, next: NextFunction) {
+    if (req.user.id.toString() !== req.equipment.technician.toString()) {
+        const error = new Error('Acción no válida')
+        res.status(400).json({ error: error.message })
+        return
+    }
+    next()
+}
+

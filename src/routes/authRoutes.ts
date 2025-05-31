@@ -9,6 +9,8 @@ const router = Router()
 router.post('/create-account',
     body('name')
         .notEmpty().withMessage('El nombre no puede ir vacio'),
+    body('lastName')
+        .notEmpty().withMessage('El apellido no puede ir vacio'),
     body('password')
         .isLength({ min: 8 }).withMessage('El password es muy corto, minimo 8 caracteres'),
     body('confirmPassword').custom((value, { req }) => {
@@ -85,6 +87,8 @@ router.put('/profile',
     autenticate,
     body('name')
         .notEmpty().withMessage('El nombre no puede ir vacio'),
+    body('lastName')
+        .notEmpty().withMessage('El apellido no puede ir vacio'),
     body('email')
         .isEmail().withMessage('E-mail no válido'),
     handleInputErrors,
@@ -105,6 +109,14 @@ router.post('/update-password',
     }),
     handleInputErrors,
     AuthController.updateCurrentUserPassword
+)
+
+router.put('/notifications',
+    autenticate,
+    body('notificationsEnabled')
+        .isBoolean().withMessage('El valor de notificaciones debe ser verdadero o falso'),
+    handleInputErrors,
+    AuthController.updateNotifications
 )
 
 export default router

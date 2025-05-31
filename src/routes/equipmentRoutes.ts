@@ -4,10 +4,13 @@ import { EquipmentController } from "../controllers/EquipmentController";
 import { handleInputErrors } from "../middleware/validation";
 import { MaintenanceController } from "../controllers/maintenanceController";
 import { validateFilterCleaning, validateMaintenanceData, validateMaintenanceType, validatePreventiveMaintenance } from "../middleware/maintenanceValidation";
+import { autenticate } from '../middleware/auth'
 import { validateEquipmentExists } from "../middleware/Equipment";
-import { validateMaintenanceExists } from "../middleware/Maintenance";
+import { hasAuthorization, validateMaintenanceExists } from "../middleware/Maintenance";
 
 const router = Router();
+
+router.use(autenticate)
 
 // Obtener todos los matenimientos para dashboard
 router.get('/maintenance',
@@ -80,6 +83,7 @@ router.put(
             'Sala capacitación cafetería',
         ]).withMessage('La ubicación no es válida'),
     handleInputErrors,
+    hasAuthorization,
     EquipmentController.updateEquipment
 );
 
@@ -101,6 +105,7 @@ router.get('/:equipmentId/maintenance',
     param('equipmentId')
         .isMongoId().withMessage('El ID del equipo no es válido'),
     handleInputErrors,
+    hasAuthorization,
     MaintenanceController.getAllMaintenancesByEquipment
 );
 
@@ -116,6 +121,7 @@ router.get('/maintenance/:maintenanceId',
 
 // Crear un nuevo mantenimiento
 router.post('/:equipmentId/maintenance',
+    hasAuthorization,
     param('equipmentId')
         .isMongoId().withMessage('El ID del equipo no es válido'),
     body('type')
@@ -135,9 +141,6 @@ router.post('/:equipmentId/maintenance',
     body('cost')
         .if(body('type').equals('Correctivo'))
         .notEmpty().withMessage('El costo es obligatorio para correctivos'),
-
-    body('performedBy')
-        .isMongoId().withMessage('El ID del usuario que realizó el mantenimiento no es válido'),
     body('supervisedBy')
         .isString().withMessage('El nombre del supervisor es obligatorio'),
     handleInputErrors,
@@ -168,9 +171,6 @@ router.put('/maintenance/:maintenanceId',
     body('cost')
         .if(body('type').equals('Correctivo'))
         .notEmpty().withMessage('El costo es obligatorio para correctivos'),
-
-    body('performedBy')
-        .notEmpty().isMongoId().withMessage('El ID del usuario que realizó el mantenimiento no es válido'),
     body('supervisedBy')
         .notEmpty().withMessage('El nombre del supervisor es obligatorio'),
     handleInputErrors,
@@ -197,6 +197,7 @@ router.post('/:equipmentId/maintenance/:maintenanceId/completed',
         .notEmpty().withMessage('El estado del mantenimiento es obligatorio')
         .isBoolean().withMessage('El estado del mantenimiento debe ser un booleano'),
     handleInputErrors,
+    hasAuthorization,
     MaintenanceController.updateMaintenanceStatus
 )
 

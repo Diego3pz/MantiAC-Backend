@@ -7,6 +7,14 @@ interface IEmail {
     token: string;
 }
 
+interface IMaintenanceNotification {
+    email: string;
+    name: string;
+    equipment: string;
+    date: string;
+    type: string;
+}
+
 export class AuthEmail {
     static sendConfirmationEmail = async (user: IEmail) => {
 
@@ -74,6 +82,74 @@ export class AuthEmail {
                     </body>
                 </html>
             `,
+        };
+
+        await sendEmail(emailData);
+    };
+
+    static sendMaintenanceNotification = async (data: IMaintenanceNotification) => {
+        const emailData = {
+            sender: { name: 'Manti AC', email: 'di3godevpc@gmail.com' },
+            to: [{ email: data.email, name: data.name }],
+            subject: 'Nuevo mantenimiento asignado',
+            htmlContent: `
+                <html>
+                    <body>
+                        <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                            <div style="background-color: #2563eb; color: #ffffff; padding: 20px; text-align: center;">
+                                <h1 style="margin: 0;">Manti AC Di3goDev</h1>
+                            </div>
+                            <div style="padding: 20px; color: #333333;">
+                                <p style="font-size: 16px;">Hola <b>${data.name}</b>,</p>
+                                <p style="font-size: 16px;">Se te ha asignado un nuevo mantenimiento:</p>
+                                <ul>
+                                    <li><b>Equipo:</b> ${data.equipment}</li>
+                                    <li><b>Tipo:</b> ${data.type}</li>
+                                    <li><b>Fecha:</b> ${data.date}</li>
+                                </ul>
+                                <p style="font-size: 16px;">Por favor, revisa la plataforma para más detalles.</p>
+                            </div>
+                            <div style="background-color: #f4f4f9; color: #666666; text-align: center; padding: 10px; font-size: 12px;">
+                                <p style="margin: 0;">Manti AC Di3goDev &copy; 2025</p>
+                            </div>
+                        </div>
+                    </body>
+                </html>
+            `,
+        };
+
+        await sendEmail(emailData);
+    };
+
+    static sendMaintenanceCompletedNotification = async (data: IMaintenanceNotification) => {
+        const emailData = {
+            sender: { name: 'Manti AC', email: 'di3godevpc@gmail.com' },
+            to: [{ email: data.email, name: data.name }],
+            subject: 'Mantenimiento completado',
+            htmlContent: `
+            <html>
+                <body>
+                    <div style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); overflow: hidden;">
+                        <div style="background-color: #22c55e; color: #ffffff; padding: 20px; text-align: center;">
+                            <h1 style="margin: 0;">Manti AC Di3goDev</h1>
+                        </div>
+                        <div style="padding: 20px; color: #333333;">
+                            <p style="font-size: 16px;">Hola <b>${data.name}</b>,</p>
+                            <p style="font-size: 16px;">El mantenimiento asignado ha sido <b>completado</b>:</p>
+                            <ul>
+                                <li><b>Equipo:</b> ${data.equipment}</li>
+                                <li><b>Tipo:</b> ${data.type}</li>
+                                <li><b>Fecha:</b> ${data.date}</li>
+                            </ul>
+                            <p style="font-size: 16px;">Puedes revisar los detalles en la plataforma.</p>
+                        </div>
+                        <div style="background-color: #f4f4f9; color: #666666; text-align: center; padding: 10px; font-size: 12px;">
+                            <p style="margin: 0;">Manti AC Di3goDev &copy; 2025</p>
+                        </div>
+                    </div>
+                </body>
+            </html>
+        `,
         };
 
         await sendEmail(emailData);

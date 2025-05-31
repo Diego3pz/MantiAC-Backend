@@ -26,7 +26,7 @@ export const autenticate = async (req: Request, res: Response, next: NextFunctio
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
         if (typeof decoded === 'object' && decoded.id) {
-            const user = await User.findById(decoded.id).select('_id name email')
+            const user = await User.findById(decoded.id).select('_id name lastName email notificationsEnabled')
             if (user) {
                 req.user = user
                 next()
