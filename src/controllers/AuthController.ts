@@ -274,7 +274,7 @@ export class AuthController {
 
         req.user.name = name
         req.user.lastName = lastName
-            req.user.email = email
+        req.user.email = email
 
         try {
             await req.user.save()
@@ -320,6 +320,29 @@ export class AuthController {
             res.send('Notificaciones actualizadas correctamente');
         } catch (error) {
             res.status(500).json({ message: 'Error interno del servidor' })
+        }
+    }
+
+    static deleteAccount = async (req: Request, res: Response): Promise<void> => {
+        try {
+            const { currentPassword } = req.body;
+            // Busca el usuario con el password solo aquí
+            const user = await User.findById(req.user._id).select('+password');
+            if (!user) {
+                res.status(404).json({ error: 'El usuario no existe' });
+                return
+            }
+
+            const isPasswordCorrect = await checkPassword(currentPassword, user.password);
+            if (!isPasswordCorrect) {
+                res.status(401).json({ error: 'La contraseña es incorrecta' });
+                return
+            }
+
+            await user.deleteOne();
+            res.send('Cuenta eliminada correctamente');
+        } catch (error) {
+            res.status(500).json({ message: 'Error interno del servidor' });
         }
     }
 }

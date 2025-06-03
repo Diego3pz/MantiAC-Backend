@@ -119,4 +119,13 @@ router.put('/notifications',
     AuthController.updateNotifications
 )
 
+
+router.post("/delete-account",
+    autenticate,
+    body("currentPassword")
+    .notEmpty().withMessage("La contraseña es obligatoria"),
+    handleInputErrors,
+    AuthController.deleteAccount
+);
+
 export default router
